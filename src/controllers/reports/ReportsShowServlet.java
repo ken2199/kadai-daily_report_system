@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import models.Employee;
 import models.Report;
 import utils.DBUtil;
 
@@ -36,10 +37,24 @@ public class ReportsShowServlet extends HttpServlet {
 
         Report r = em.find(Report.class, Integer.parseInt(request.getParameter("id")));
 
-        em.close();
 
+
+        //レポート情報とセッションIDをリクエストスコープに登録
         request.setAttribute("report", r);
         request.setAttribute("_token", request.getSession().getId());
+
+
+         // レポートIDをセッションスコープに登録
+        request.getSession().setAttribute("report_id", r.getId());
+
+        Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
+        long iine_check = (long)em.createNamedQuery("getIineCheck", Long.class)
+                                             .setParameter("report", r)
+                                             .setParameter("employee", login_employee)
+                                             .getSingleResult();
+        request.setAttribute("iine_check", iine_check);
+
+        em.close();
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/show.jsp");
         rd.forward(request, response);

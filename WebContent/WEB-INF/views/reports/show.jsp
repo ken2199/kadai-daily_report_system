@@ -9,6 +9,7 @@
 
                 <table>
                     <tbody>
+                    <p>結果は<c:out value="${iine_check}" /></p>
                         <tr>
                             <th>氏名</th>
                             <td><c:out value="${report.employee.name}" /></td>
@@ -35,11 +36,27 @@
                                 <fmt:formatDate value="${report.updated_at}" pattern="yyyy-MM-dd HH:mm:ss" />
                             </td>
                         </tr>
+                        <tr>
+                            <th>いいね数</th>
+                            <c:choose>
+                              <c:when test="${report.iine == 0}">
+                                <td><c:out value="${report.iine}" /></td>
+                              </c:when>
+                              <c:otherwise>
+                                <td><a href="<c:url value='/iines/index?id=${report.id}' />">${report.iine}</a></td>
+                              </c:otherwise>
+                            </c:choose>
+                        </tr>
                     </tbody>
                 </table>
 
                 <c:if test="${sessionScope.login_employee.id == report.employee.id}">
                     <p><a href="<c:url value="/reports/edit?id=${report.id}" />">この日報を編集する</a></p>
+                </c:if>
+                <c:if test="${sessionScope.login_employee.id != report.employee.id && iine_check == 0}">
+                <form method="POST" action="<c:url value='/iines/update' />">
+                    <button >いいね</button>
+                </form>
                 </c:if>
             </c:when>
             <c:otherwise>
